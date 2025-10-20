@@ -1,0 +1,38 @@
+title: Wave Planning Service Documentation
+description: Warehouse picking wave creation and optimization service
+theme: jekyll-theme-cayman
+baseurl: "/wave-planning-service"
+url: "https://paklog.github.io"
+
+# Navigation
+navigation:
+  - title: Home
+    url: /
+  - title: Architecture
+    url: /architecture
+  - title: Domain Model
+    url: /DOMAIN-MODEL
+  - title: Sequence Diagrams
+    url: /SEQUENCE-DIAGRAMS
+  - title: API Documentation
+    url: /openapi
+
+# GitHub
+github:
+  repository_url: https://github.com/paklog/wave-planning-service
+
+# Build settings
+markdown: kramdown
+plugins:
+  - jekyll-relative-links
+
+relative_links:
+  enabled: true
+  collections: false
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
