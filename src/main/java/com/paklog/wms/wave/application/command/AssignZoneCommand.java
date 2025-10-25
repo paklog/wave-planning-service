@@ -13,6 +13,8 @@ public record AssignZoneCommand(
         }
         if (zone == null || zone.isBlank()) {
             throw new IllegalArgumentException("Zone cannot be null or empty");
-        }
-    }
+        
+
+}
+}
 }

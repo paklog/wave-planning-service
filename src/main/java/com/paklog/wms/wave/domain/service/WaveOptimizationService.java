@@ -2,6 +2,7 @@ package com.paklog.wms.wave.domain.service;
 
 import com.paklog.wms.wave.domain.aggregate.Wave;
 import com.paklog.wms.wave.domain.entity.Order;
+import com.paklog.wms.wave.domain.entity.WaveMetrics;
 import com.paklog.wms.wave.domain.valueobject.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -451,15 +452,20 @@ public class WaveOptimizationService {
             WaveStrategyType strategyType) {
 
         Wave wave = new Wave();
-        WaveStrategy strategy = WaveStrategy.builder()
-                .type(strategyType)
-                .build();
+        WaveStrategy.Builder strategyBuilder = WaveStrategy.builder()
+                .type(strategyType);
+
+        if (strategyType == WaveStrategyType.TIME_BASED) {
+            strategyBuilder.timeInterval(Duration.ofHours(1));
+        }
+
+        WaveStrategy strategy = strategyBuilder.build();
 
         wave.plan(
                 orders.stream().map(Order::getOrderId).collect(Collectors.toList()),
                 strategy,
                 warehouseId,
-                1,
+                WavePriority.NORMAL,
                 LocalDateTime.now().plusHours(1)
         );
 
@@ -554,6 +560,8 @@ public class WaveOptimizationService {
         public OptimizationCriteria setPrioritizeSLA(boolean value) {
             this.prioritizeSLA = value;
             return this;
-        }
-    }
+        
+
+}
+}
 }

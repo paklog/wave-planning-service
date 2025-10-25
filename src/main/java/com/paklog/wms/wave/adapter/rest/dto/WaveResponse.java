@@ -68,6 +68,8 @@ public record WaveResponse(
                     metrics.getTotalOrders(),
                     metrics.getCompletedOrders()
             );
-        }
-    }
+        
+
+}
+}
 }

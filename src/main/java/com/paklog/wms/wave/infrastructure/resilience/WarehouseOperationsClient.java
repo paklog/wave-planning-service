@@ -26,7 +26,7 @@ public class WarehouseOperationsClient {
     private final WebClient webClient;
 
     public WarehouseOperationsClient(
-            @Value("${paklog.features.shadow-mode.legacy-endpoint:http://warehouse-operations:8080}") String legacyEndpoint
+            @Value("${warehouse.operations.endpoint:http://localhost:8080}") String legacyEndpoint
     ) {
         this.webClient = WebClient.builder()
                 .baseUrl(legacyEndpoint)

@@ -1,25 +1,26 @@
 package com.paklog.wms.wave.infrastructure.events;
 
+import com.paklog.integration.outbox.OutboxEvent;
+import com.paklog.integration.outbox.OutboxService;
 import com.paklog.wms.wave.domain.event.WavePlannedEvent;
+import com.paklog.wms.wave.domain.event.WaveReleasedEvent;
 import com.paklog.wms.wave.domain.valueobject.WavePriority;
 import com.paklog.wms.wave.domain.valueobject.WaveStrategyType;
-import io.cloudevents.CloudEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,20 +28,18 @@ import static org.mockito.Mockito.when;
 class WaveEventPublisherTest {
 
     @Mock
-    private KafkaTemplate<String, Object> kafkaTemplate;
+    private OutboxService outboxService;
 
     private WaveEventPublisher publisher;
 
     @BeforeEach
     void setUp() {
-        publisher = new WaveEventPublisher(kafkaTemplate, "wms-wave-events", "/test/source");
+        publisher = new WaveEventPublisher(outboxService);
+        when(outboxService.saveEvent(any(), any(), any())).thenReturn(new OutboxEvent());
     }
 
     @Test
-    void publishEventBuildsCloudEventWithExpectedType() {
-        when(kafkaTemplate.send(eq("wms-wave-events"), any(String.class), any()))
-                .thenReturn(CompletableFuture.completedFuture(null));
-
+    void publishEventSavesEventInOutbox() {
         WavePlannedEvent event = new WavePlannedEvent(
                 "WAVE-1",
                 List.of("ORD-1"),
@@ -52,19 +51,41 @@ class WaveEventPublisherTest {
 
         publisher.publishEvent(event);
 
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<CloudEvent> cloudEventCaptor = ArgumentCaptor.forClass(CloudEvent.class);
-        verify(kafkaTemplate).send(eq("wms-wave-events"), any(String.class), cloudEventCaptor.capture());
+        ArgumentCaptor<String> aggregateCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> eventTypeCaptor = ArgumentCaptor.forClass(String.class);
+        verify(outboxService).saveEvent(aggregateCaptor.capture(), eventTypeCaptor.capture(), eq(event));
 
-        CloudEvent cloudEvent = cloudEventCaptor.getValue();
-        assertThat(cloudEvent.getType()).isEqualTo("com.paklog.wms.wave.wave.planned.v1");
-        assertThat(cloudEvent.getSource().toString()).isEqualTo("/test/source");
+        assertThat(aggregateCaptor.getValue()).isEqualTo("WAVE-1");
+        assertThat(eventTypeCaptor.getValue()).isEqualTo("com.paklog.wms.wave.wave.planned.v1");
     }
 
     @Test
-    void publishEventWrapsExceptions() {
-        when(kafkaTemplate.send(eq("wms-wave-events"), any(String.class), any()))
-                .thenThrow(new RuntimeException("kafka down"));
+    void publishEventsPublishesAllDomainEvents() {
+        WaveReleasedEvent releasedEvent = new WaveReleasedEvent(
+                "WAVE-2",
+                List.of("ORD-3"),
+                "WH-2",
+                "ZONE-A",
+                WavePriority.HIGH
+        );
+        WavePlannedEvent plannedEvent = new WavePlannedEvent(
+                "WAVE-2",
+                List.of("ORD-3"),
+                "WH-2",
+                WaveStrategyType.CAPACITY_BASED,
+                WavePriority.HIGH,
+                LocalDateTime.now()
+        );
+
+        publisher.publishEvents(List.of(releasedEvent, plannedEvent));
+
+        verify(outboxService, times(2)).saveEvent(eq("WAVE-2"), any(), any());
+    }
+
+    @Test
+    void publishEventWrapsOutboxFailures() {
+        when(outboxService.saveEvent(any(), any(), any()))
+                .thenThrow(new RuntimeException("outbox down"));
 
         WavePlannedEvent event = new WavePlannedEvent(
                 "WAVE-ERROR",
@@ -77,6 +98,6 @@ class WaveEventPublisherTest {
 
         assertThatThrownBy(() -> publisher.publishEvent(event))
                 .isInstanceOf(WaveEventPublisher.EventPublishException.class)
-                .hasMessageContaining("Failed to publish event");
+                .hasMessageContaining("Failed to save event to outbox");
     }
 }

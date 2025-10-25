@@ -29,6 +29,8 @@ public record CreateWaveCommand(
         }
         if (warehouseId == null || warehouseId.isBlank()) {
             throw new IllegalArgumentException("Warehouse ID cannot be null or empty");
-        }
-    }
+        
+
+}
+}
 }

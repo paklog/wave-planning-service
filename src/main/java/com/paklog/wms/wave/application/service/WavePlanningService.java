@@ -189,6 +189,8 @@ public class WavePlanningService {
     public static class WaveNotFoundException extends RuntimeException {
         public WaveNotFoundException(String waveId) {
             super("Wave not found: " + waveId);
-        }
-    }
+        
+
+}
+}
 }

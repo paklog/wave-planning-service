@@ -5,18 +5,14 @@ import com.paklog.wms.wave.domain.valueobject.WavePriority;
 import com.paklog.wms.wave.domain.valueobject.WaveStatus;
 import com.paklog.wms.wave.domain.valueobject.WaveStrategy;
 import com.paklog.wms.wave.domain.valueobject.WaveStrategyType;
-import org.bson.Document;
+import com.paklog.wms.wave.support.TestMongoConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -30,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Testcontainers
 @DataMongoTest
-@Import(WaveRepositoryIntegrationTest.MongoConfig.class)
+@Import(TestMongoConfig.class)
 class WaveRepositoryIntegrationTest {
 
     @Container
@@ -116,47 +112,5 @@ class WaveRepositoryIntegrationTest {
                 plannedReleaseTime
         );
         return wave;
-    }
-
-    @TestConfiguration
-    static class MongoConfig {
-        @Bean
-        MongoCustomConversions mongoCustomConversions() {
-            Converter<WaveStrategy, Document> writeConverter = new Converter<>() {
-                @Override
-                public Document convert(WaveStrategy source) {
-                    Document document = new Document();
-                    document.put("type", source.getType().name());
-                    document.put("maxWaveSize", source.getMaxWaveSize());
-                    document.put("maxOrders", source.getMaxOrders());
-                    document.put("maxLines", source.getMaxLines());
-                    document.put("timeInterval", source.getTimeInterval() != null ? source.getTimeInterval().toString() : null);
-                    return document;
-                }
-            };
-
-            Converter<Document, WaveStrategy> readConverter = new Converter<>() {
-                @Override
-                public WaveStrategy convert(Document source) {
-                    WaveStrategy.Builder builder = WaveStrategy.builder()
-                            .type(WaveStrategyType.valueOf(source.getString("type")));
-                    if (source.containsKey("maxWaveSize") && source.get("maxWaveSize") != null) {
-                        builder.maxWaveSize(((Number) source.get("maxWaveSize")).intValue());
-                    }
-                    if (source.containsKey("maxOrders") && source.get("maxOrders") != null) {
-                        builder.maxOrders(((Number) source.get("maxOrders")).intValue());
-                    }
-                    if (source.containsKey("maxLines") && source.get("maxLines") != null) {
-                        builder.maxLines(((Number) source.get("maxLines")).intValue());
-                    }
-                    if (source.containsKey("timeInterval") && source.get("timeInterval") != null) {
-                        builder.timeInterval(Duration.parse(source.getString("timeInterval")));
-                    }
-                    return builder.build();
-                }
-            };
-
-            return new MongoCustomConversions(List.of(writeConverter, readConverter));
-        }
     }
 }

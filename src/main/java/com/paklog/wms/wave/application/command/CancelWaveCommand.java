@@ -13,6 +13,8 @@ public record CancelWaveCommand(
         }
         if (reason == null || reason.isBlank()) {
             throw new IllegalArgumentException("Cancellation reason cannot be null or empty");
-        }
-    }
+        
+
+}
+}
 }

@@ -33,7 +33,6 @@ public class ReconciliationService {
     private final FeatureFlagService featureFlagService;
     private final ReconciliationMetrics metrics;
 
-    @Value("${paklog.features.reconciliation.max-variance-percentage:5.0}")
     private double maxVariancePercentage;
 
     public ReconciliationService(

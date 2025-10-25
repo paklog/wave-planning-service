@@ -198,6 +198,21 @@ public class Wave {
     }
 
     /**
+     * Reorder existing orders without changing membership.
+     */
+    public void reorderOrders(List<String> newOrderSequence) {
+        Objects.requireNonNull(newOrderSequence, "Order sequence cannot be null");
+        if (this.status != WaveStatus.PLANNED) {
+            throw new IllegalStateException("Can only reorder orders for planned waves");
+        }
+        if (newOrderSequence.size() != this.orderIds.size()
+                || !this.orderIds.containsAll(newOrderSequence)) {
+            throw new IllegalArgumentException("New sequence must contain the same orders");
+        }
+        this.orderIds = new ArrayList<>(newOrderSequence);
+    }
+
+    /**
      * Remove orders from the wave
      */
     public void removeOrders(List<String> orderIdsToRemove) {
@@ -282,6 +297,10 @@ public class Wave {
 
     public LocalDateTime getPlannedReleaseTime() {
         return plannedReleaseTime;
+    }
+
+    public void setPlannedReleaseTime(LocalDateTime plannedReleaseTime) {
+        this.plannedReleaseTime = plannedReleaseTime;
     }
 
     public LocalDateTime getActualReleaseTime() {

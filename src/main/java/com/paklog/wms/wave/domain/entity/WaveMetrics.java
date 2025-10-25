@@ -1,5 +1,6 @@
 package com.paklog.wms.wave.domain.entity;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -19,6 +20,10 @@ public class WaveMetrics {
     private Integer totalLines;
     private Integer completedLines;
     private Integer totalUnits;
+    private BigDecimal totalVolume;
+    private BigDecimal totalWeight;
+    private Integer estimatedPickers;
+    private LocalDateTime estimatedCompletionTime;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
@@ -32,6 +37,10 @@ public class WaveMetrics {
         this.totalLines = 0;
         this.completedLines = 0;
         this.totalUnits = 0;
+        this.totalVolume = BigDecimal.ZERO;
+        this.totalWeight = BigDecimal.ZERO;
+        this.estimatedPickers = 0;
+        this.estimatedCompletionTime = null;
     }
 
     public void recordPickStart() {
@@ -147,6 +156,38 @@ public class WaveMetrics {
 
     public void setTotalUnits(Integer totalUnits) {
         this.totalUnits = totalUnits;
+    }
+
+    public BigDecimal getTotalVolume() {
+        return totalVolume;
+    }
+
+    public void setTotalVolume(BigDecimal totalVolume) {
+        this.totalVolume = totalVolume;
+    }
+
+    public BigDecimal getTotalWeight() {
+        return totalWeight;
+    }
+
+    public void setTotalWeight(BigDecimal totalWeight) {
+        this.totalWeight = totalWeight;
+    }
+
+    public Integer getEstimatedPickers() {
+        return estimatedPickers;
+    }
+
+    public void setEstimatedPickers(Integer estimatedPickers) {
+        this.estimatedPickers = estimatedPickers;
+    }
+
+    public LocalDateTime getEstimatedCompletionTime() {
+        return estimatedCompletionTime;
+    }
+
+    public void setEstimatedCompletionTime(LocalDateTime estimatedCompletionTime) {
+        this.estimatedCompletionTime = estimatedCompletionTime;
     }
 
     public LocalDateTime getStartTime() {

@@ -22,6 +22,8 @@ public class WaveCapacity {
         this.maxPickers = builder.maxPickers;
     }
 
+
+
     public int getMaxOrders() {
         return maxOrders;
     }

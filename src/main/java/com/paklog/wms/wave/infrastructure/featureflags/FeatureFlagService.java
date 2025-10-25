@@ -17,13 +17,10 @@ public class FeatureFlagService {
     private static final Logger logger = LoggerFactory.getLogger(FeatureFlagService.class);
     private final Random random = new Random();
 
-    @Value("${paklog.features.shadow-mode.enabled:false}")
     private boolean shadowModeEnabled;
 
-    @Value("${paklog.features.shadow-mode.percentage:0}")
     private int shadowModePercentage;
 
-    @Value("${paklog.features.reconciliation.enabled:true}")
     private boolean reconciliationEnabled;
 
     /**

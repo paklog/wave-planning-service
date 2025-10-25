@@ -171,6 +171,8 @@ public class OrderEventHandler {
 
         } catch (Exception e) {
             logger.error("Error handling InventoryShortageEvent", e);
-        }
-    }
+        
+
+}
+}
 }

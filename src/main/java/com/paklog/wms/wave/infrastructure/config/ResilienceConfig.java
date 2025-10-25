@@ -21,25 +21,18 @@ public class ResilienceConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(ResilienceConfig.class);
 
-    @Value("${paklog.circuit-breaker.warehouse-operations.failure-rate-threshold:50}")
     private int failureRateThreshold;
 
-    @Value("${paklog.circuit-breaker.warehouse-operations.slow-call-rate-threshold:50}")
     private int slowCallRateThreshold;
 
-    @Value("${paklog.circuit-breaker.warehouse-operations.slow-call-duration-threshold:2s}")
     private Duration slowCallDurationThreshold;
 
-    @Value("${paklog.circuit-breaker.warehouse-operations.wait-duration-in-open-state:60s}")
     private Duration waitDurationInOpenState;
 
-    @Value("${paklog.circuit-breaker.warehouse-operations.sliding-window-size:100}")
     private int slidingWindowSize;
 
-    @Value("${paklog.circuit-breaker.warehouse-operations.minimum-number-of-calls:10}")
     private int minimumNumberOfCalls;
 
-    @Value("${paklog.circuit-breaker.warehouse-operations.permitted-calls-in-half-open-state:3}")
     private int permittedCallsInHalfOpenState;
 
     @Bean

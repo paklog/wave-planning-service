@@ -17,6 +17,7 @@ public class WaveId {
         this.value = value;
     }
 
+
     public static WaveId of(String value) {
         return new WaveId(value);
     }
