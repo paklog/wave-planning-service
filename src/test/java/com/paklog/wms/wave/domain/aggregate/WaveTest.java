@@ -1,6 +1,6 @@
 package com.paklog.wms.wave.domain.aggregate;
 
-import com.paklog.domain.shared.DomainEvent;
+import com.paklog.wave.planning.domain.shared.DomainEvent;
 import com.paklog.wms.wave.domain.event.WaveCancelledEvent;
 import com.paklog.wms.wave.domain.event.WaveCompletedEvent;
 import com.paklog.wms.wave.domain.event.WavePlannedEvent;

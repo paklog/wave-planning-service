@@ -1,6 +1,6 @@
 package com.paklog.wms.wave.domain.event;
 
-import com.paklog.domain.shared.DomainEvent;
+import com.paklog.wave.planning.domain.shared.DomainEvent;
 
 import java.time.LocalDateTime;
 

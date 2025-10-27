@@ -2,7 +2,7 @@ package com.paklog.wms.wave.domain.valueobject;
 
 /**
  * Wave priority levels
- * Uses same priority model as paklog-domain but specific to waves
+ * Independent priority model for Wave Planning bounded context
  */
 public enum WavePriority {
     CRITICAL(1),
@@ -26,19 +26,5 @@ public enum WavePriority {
 
     public boolean isLowerThan(WavePriority other) {
         return this.value > other.value;
-    }
-
-    /**
-     * Convert from paklog-domain Priority
-     */
-    public static WavePriority fromDomainPriority(com.paklog.domain.valueobject.Priority priority) {
-        return valueOf(priority.name());
-    }
-
-    /**
-     * Convert to paklog-domain Priority
-     */
-    public com.paklog.domain.valueobject.Priority toDomainPriority() {
-        return com.paklog.domain.valueobject.Priority.valueOf(this.name());
     }
 }

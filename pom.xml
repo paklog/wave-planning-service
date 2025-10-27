@@ -43,24 +43,10 @@
             <artifactId>cloudevents-spring</artifactId>
             <version>${cloudevents.version}</version>
         </dependency>
-
-        <!-- PakLog Common Libraries -->
         <dependency>
-            <groupId>com.paklog.common</groupId>
-            <artifactId>paklog-domain</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.paklog.common</groupId>
-            <artifactId>paklog-events</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.paklog.common</groupId>
-            <artifactId>paklog-integration</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <groupId>io.cloudevents</groupId>
+            <artifactId>cloudevents-kafka</artifactId>
+            <version>${cloudevents.version}</version>
         </dependency>
 
         <dependency>
