@@ -1,7 +1,7 @@
 package com.paklog.wms.wave.application.service;
 
-import com.paklog.integration.outbox.OutboxEvent;
-import com.paklog.integration.outbox.OutboxService;
+import com.paklog.wave.planning.infrastructure.outbox.OutboxEvent;
+import com.paklog.wave.planning.infrastructure.outbox.OutboxService;
 import com.paklog.wms.wave.application.command.AssignZoneCommand;
 import com.paklog.wms.wave.application.command.CreateWaveCommand;
 import com.paklog.wms.wave.application.command.ReleaseWaveCommand;

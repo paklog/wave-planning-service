@@ -1,8 +1,8 @@
 package com.paklog.wms.wave.infrastructure.outbox;
 
-import com.paklog.integration.outbox.OutboxEvent;
-import com.paklog.integration.outbox.OutboxRepository;
-import com.paklog.integration.outbox.OutboxStatus;
+import com.paklog.wave.planning.infrastructure.outbox.OutboxEvent;
+import com.paklog.wave.planning.infrastructure.outbox.OutboxRepository;
+import com.paklog.wave.planning.infrastructure.outbox.OutboxStatus;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;

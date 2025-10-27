@@ -1,7 +1,7 @@
 package com.paklog.wms.wave.infrastructure.events;
 
-import com.paklog.domain.shared.DomainEvent;
-import com.paklog.integration.outbox.OutboxService;
+import com.paklog.wave.planning.domain.shared.DomainEvent;
+import com.paklog.wave.planning.infrastructure.outbox.OutboxService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

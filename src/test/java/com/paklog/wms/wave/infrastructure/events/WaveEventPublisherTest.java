@@ -1,7 +1,7 @@
 package com.paklog.wms.wave.infrastructure.events;
 
-import com.paklog.integration.outbox.OutboxEvent;
-import com.paklog.integration.outbox.OutboxService;
+import com.paklog.wave.planning.infrastructure.outbox.OutboxEvent;
+import com.paklog.wave.planning.infrastructure.outbox.OutboxService;
 import com.paklog.wms.wave.domain.event.WavePlannedEvent;
 import com.paklog.wms.wave.domain.event.WaveReleasedEvent;
 import com.paklog.wms.wave.domain.valueobject.WavePriority;

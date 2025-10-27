@@ -1,8 +1,8 @@
 package com.paklog.wms.wave.infrastructure.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.paklog.integration.outbox.OutboxRepository;
-import com.paklog.integration.outbox.OutboxService;
+import com.paklog.wave.planning.infrastructure.outbox.OutboxRepository;
+import com.paklog.wave.planning.infrastructure.outbox.OutboxService;
 import com.paklog.wms.wave.infrastructure.outbox.MongoOutboxRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
