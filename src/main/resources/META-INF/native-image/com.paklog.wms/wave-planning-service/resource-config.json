@@ -1,0 +1,25 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "application\\.yml"
+      },
+      {
+        "pattern": "application-.*\\.yml"
+      },
+      {
+        "pattern": "logback-spring\\.xml"
+      },
+      {
+        "pattern": "META-INF/spring\\.factories"
+      },
+      {
+        "pattern": "META-INF/spring/.*"
+      },
+      {
+        "pattern": "org/springframework/.*"
+      }
+    ]
+  },
+  "bundles": []
+}

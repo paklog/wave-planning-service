@@ -1,10 +1,12 @@
 package com.paklog.wms.wave;
 
+import com.paklog.wms.wave.config.NativeRuntimeHintsRegistrar;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.context.annotation.ImportRuntimeHints;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -27,6 +29,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 })
 @EnableScheduling  // Enable scheduled tasks (reconciliation, outbox cleanup)
 @EnableAsync      // Enable async execution (shadow mode)
+@ImportRuntimeHints(NativeRuntimeHintsRegistrar.class)  // GraalVM native image support
 public class WavePlanningServiceApplication {
 
     public static void main(String[] args) {

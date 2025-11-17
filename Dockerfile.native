@@ -1,0 +1,65 @@
+# ============================================
+# Multi-stage Dockerfile for Wave Planning Service - GraalVM Native Image
+# Optimized for fast startup and low memory footprint
+# ============================================
+
+# ============================================
+# Stage 1: Build Stage with GraalVM
+# ============================================
+FROM ghcr.io/graalvm/native-image-community:21-ol9 AS builder
+
+# Set build arguments
+ARG APP_VERSION=1.0.0-SNAPSHOT
+ARG BUILD_DATE
+ARG VCS_REF
+
+# Install Maven
+RUN microdnf install -y maven findutils
+
+# Set working directory
+WORKDIR /build
+
+# Copy Maven files for dependency caching
+COPY pom.xml .
+
+# Download dependencies (cached layer)
+RUN mvn dependency:go-offline -B || true
+
+# Copy application source
+COPY src ./src
+
+# Build native image
+# Note: This can take several minutes and requires significant memory (4-8GB recommended)
+RUN mvn -Pnative clean package -DskipTests -B
+
+# ============================================
+# Stage 2: Runtime Stage - Minimal distroless image
+# ============================================
+FROM gcr.io/distroless/base-debian12:latest
+
+# Metadata labels (OCI standard)
+LABEL org.opencontainers.image.title="Wave Planning Service (Native)" \
+      org.opencontainers.image.description="Multi-strategy wave optimization service - GraalVM Native Image" \
+      org.opencontainers.image.version="${APP_VERSION}" \
+      org.opencontainers.image.vendor="Paklog" \
+      org.opencontainers.image.authors="Paklog Engineering Team" \
+      org.opencontainers.image.source="https://github.com/paklog/wave-planning-service" \
+      com.paklog.service.tier="execution" \
+      com.paklog.service.phase="3" \
+      com.paklog.build.type="native"
+
+# Set working directory
+WORKDIR /app
+
+# Copy native executable from builder
+COPY --from=builder /build/target/wave-planning-service /app/wave-planning-service
+
+# Expose application port
+EXPOSE 8080
+
+# Health check (native image starts much faster, reduce start-period)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD ["/app/wave-planning-service", "--help"] || exit 1
+
+# Run the native executable
+ENTRYPOINT ["/app/wave-planning-service"]

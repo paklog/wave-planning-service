@@ -101,7 +101,7 @@ src/main/java/com/paklog/wms/wave/
 
 ### Core Framework
 - **Java 21** - Programming language
-- **Spring Boot 3.2** - Application framework
+- **Spring Boot 3.2** - Application framework with GraalVM Native Image support
 - **Maven** - Build and dependency management
 
 ### Data & Persistence
@@ -215,6 +215,33 @@ docker-compose logs -f wave-planning-service
 # Stop all services
 docker-compose down
 ```
+
+### GraalVM Native Image Build
+
+For improved startup time (~0.2s vs ~6s) and reduced memory footprint (~150MB vs ~600MB):
+
+```bash
+# Build native executable (requires GraalVM)
+./mvnw -Pnative clean package -DskipTests
+
+# Run native executable
+./target/wave-planning-service
+```
+
+Or build as a Docker image:
+
+```bash
+# Build native Docker image
+docker build -f Dockerfile.native -t wave-planning-service:native .
+
+# Run native container
+docker run -p 8080:8080 \
+  -e MONGODB_URI=mongodb://host.docker.internal:27017/wave_planning \
+  -e KAFKA_BOOTSTRAP_SERVERS=host.docker.internal:9092 \
+  wave-planning-service:native
+```
+
+For detailed native image build instructions, see [NATIVE_BUILD.md](NATIVE_BUILD.md).
 
 ## API Documentation
 
