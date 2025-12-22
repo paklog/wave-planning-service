@@ -88,6 +88,50 @@ paklog:
       minimum-number-of-calls: 10
       wait-duration-in-open-state: 60s
 
+# Resilience4j Configuration for Order Management Service Integration
+resilience4j:
+  circuitbreaker:
+    instances:
+      orderManagementService:
+        # Open circuit after 50% failure rate
+        failure-rate-threshold: 50
+        # Minimum number of calls before circuit breaker can calculate failure rate
+        minimum-number-of-calls: 10
+        # Number of calls allowed in half-open state to test if service recovered
+        permitted-number-of-calls-in-half-open-state: 3
+        # Wait 60 seconds before transitioning from open to half-open
+        wait-duration-in-open-state: 60s
+        # Sliding window size for calculating failure rate
+        sliding-window-size: 100
+        sliding-window-type: COUNT_BASED
+        # Record exceptions as failures
+        record-exceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - org.springframework.web.client.HttpServerErrorException
+          - com.paklog.wms.wave.infrastructure.client.OrderManagementClient$OrderManagementServiceException
+        # Slow call threshold: calls taking longer than 5s are considered slow
+        slow-call-duration-threshold: 5s
+        slow-call-rate-threshold: 50
+
+  retry:
+    instances:
+      orderManagementService:
+        # Maximum number of retry attempts
+        max-attempts: 3
+        # Wait time between retries (exponential backoff)
+        wait-duration: 1s
+        # Enable exponential backoff (1s, 2s, 4s)
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        # Retry only on specific exceptions
+        retry-exceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - org.springframework.web.client.HttpServerErrorException
+          - com.paklog.wms.wave.infrastructure.client.OrderManagementClient$OrderManagementServiceException
+        # Don't retry on client errors (4xx)
+        ignore-exceptions:
+          - org.springframework.web.client.HttpClientErrorException
+
 # CloudEvents Configuration
 cloudevents:
   kafka:

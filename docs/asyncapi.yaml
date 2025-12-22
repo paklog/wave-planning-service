@@ -1,10 +1,13 @@
 asyncapi: 2.6.0
 info:
   title: Wave Planning Service Events
-  version: 1.0.0
+  version: 1.1.0
   description: |
     Event-driven API for Wave Planning Service using Apache Kafka.
     This service publishes and subscribes to events related to wave creation, optimization, and execution.
+
+    Version 1.1.0: Added hybrid inventory allocation strategy
+    - InventoryAllocationRequested: HARD allocation at wave release
   contact:
     name: WMS Team
     email: wms-team@paklog.com
@@ -58,6 +61,21 @@ channels:
       summary: Wave released event
       message:
         $ref: '#/components/messages/WaveReleased'
+      bindings:
+        kafka:
+          key:
+            type: string
+            description: Wave ID
+
+  inventory.allocation.requested:
+    description: |
+      Published when a wave is released to request HARD inventory allocation.
+      Part of hybrid allocation strategy - locks inventory for immediate physical picking.
+    publish:
+      operationId: publishInventoryAllocationRequested
+      summary: Inventory allocation requested (HARD)
+      message:
+        $ref: '#/components/messages/InventoryAllocationRequested'
       bindings:
         kafka:
           key:
@@ -189,6 +207,16 @@ components:
       contentType: application/json
       payload:
         $ref: '#/components/schemas/WaveReleasedPayload'
+
+    InventoryAllocationRequested:
+      name: InventoryAllocationRequested
+      title: Inventory Allocation Requested (HARD)
+      summary: |
+        Emitted when a wave is released to request HARD inventory allocation.
+        Part of hybrid allocation strategy - supersedes SOFT allocations from Order Management.
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/InventoryAllocationRequestedPayload'
 
     WaveStarted:
       name: WaveStarted
@@ -380,6 +408,46 @@ components:
           description: Estimated duration in minutes
         metrics:
           $ref: '#/components/schemas/WaveMetrics'
+
+    InventoryAllocationRequestedPayload:
+      type: object
+      required:
+        - waveId
+        - orderIds
+        - warehouseId
+        - allocationType
+        - requestedAt
+      description: |
+        HARD allocation request published at wave release.
+        Locks inventory for immediate physical picking.
+      properties:
+        waveId:
+          type: string
+          description: Wave identifier
+        orderIds:
+          type: array
+          description: Order IDs included in this wave
+          items:
+            type: string
+        warehouseId:
+          type: string
+          description: Warehouse where inventory is allocated
+        skuQuantities:
+          type: object
+          description: Map of SKU to total quantity needed (optional - can be resolved from orderIds)
+          additionalProperties:
+            type: integer
+        allocationType:
+          type: string
+          enum: [SOFT, HARD]
+          default: HARD
+          description: |
+            SOFT: Reservation at order validation (Order Management)
+            HARD: Final commitment at wave release (Wave Planning)
+        requestedAt:
+          type: string
+          format: date-time
+          description: When the allocation was requested
 
     WaveStartedPayload:
       type: object

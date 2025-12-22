@@ -28,10 +28,13 @@ public class WavePlanningService {
     private static final Logger logger = LoggerFactory.getLogger(WavePlanningService.class);
 
     private final WaveRepository waveRepository;
+    private final com.paklog.wms.wave.domain.service.WaveSkuCalculationService waveSkuCalculationService;
     private final WaveEventPublisher eventPublisher;
 
-    public WavePlanningService(WaveRepository waveRepository, WaveEventPublisher eventPublisher) {
+    public WavePlanningService(WaveRepository waveRepository, WaveEventPublisher eventPublisher,
+                              com.paklog.wms.wave.domain.service.WaveSkuCalculationService waveSkuCalculationService) {
         this.waveRepository = waveRepository;
+        this.waveSkuCalculationService = waveSkuCalculationService;
         this.eventPublisher = eventPublisher;
     }
 
@@ -81,8 +84,16 @@ public class WavePlanningService {
         Wave wave = waveRepository.findById(command.waveId())
                 .orElseThrow(() -> new WaveNotFoundException(command.waveId()));
 
-        // Release the wave
-        wave.release();
+        // ⭐ Calculate SKU quantities by querying Order Management Service
+        // This provides accurate inventory allocation requirements
+        java.util.Map<String, Integer> skuQuantities =
+            waveSkuCalculationService.calculateSkuQuantitiesForWave(wave.getOrderIds());
+
+        logger.info("Calculated SKU quantities for wave {}: {} unique SKUs",
+            command.waveId(), skuQuantities.size());
+
+        // Release the wave with calculated SKU quantities
+        wave.release(skuQuantities);
 
         // Save updated wave
         Wave savedWave = waveRepository.save(wave);

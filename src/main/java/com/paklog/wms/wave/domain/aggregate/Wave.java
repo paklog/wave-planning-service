@@ -7,6 +7,7 @@ import com.paklog.wms.wave.domain.event.WaveCancelledEvent;
 import com.paklog.wms.wave.domain.event.WaveCompletedEvent;
 import com.paklog.wms.wave.domain.event.WavePlannedEvent;
 import com.paklog.wms.wave.domain.event.WaveReleasedEvent;
+import com.paklog.wms.wave.domain.event.InventoryAllocationRequestedEvent;
 import com.paklog.wms.wave.domain.valueobject.WaveId;
 import com.paklog.wms.wave.domain.valueobject.WavePriority;
 import com.paklog.wms.wave.domain.valueobject.WaveStatus;
@@ -18,7 +19,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -91,8 +94,10 @@ public class Wave {
     /**
      * Release wave for execution
      * Triggers task generation in WES
+     *
+     * @param skuQuantities Pre-calculated SKU quantities from Order Management Service
      */
-    public void release() {
+    public void release(Map<String, Integer> skuQuantities) {
         ensureStatus(WaveStatus.PLANNED);
         ensureInventoryAllocated();
 
@@ -104,6 +109,7 @@ public class Wave {
         this.actualReleaseTime = LocalDateTime.now();
         this.metrics.recordPickStart();
 
+        // Publish wave released event
         registerEvent(new WaveReleasedEvent(
             this.waveId,
             this.orderIds,
@@ -111,6 +117,26 @@ public class Wave {
             this.assignedZone,
             this.priority
         ));
+
+        // ⭐ HARD ALLOCATION: Request final inventory allocation at wave release
+        // This locks inventory for immediate physical picking (part of hybrid allocation strategy)
+        // SKU quantities are calculated by WaveSkuCalculationService from Order Management
+        Map<String, Integer> quantities = skuQuantities != null ? skuQuantities : new HashMap<>();
+        registerEvent(new InventoryAllocationRequestedEvent(
+            this.waveId,
+            this.orderIds,
+            this.warehouseId,
+            quantities
+        ));
+    }
+
+    /**
+     * Overload for backwards compatibility - calculates empty SKU map
+     * @deprecated Use release(Map<String, Integer> skuQuantities) instead
+     */
+    @Deprecated
+    public void release() {
+        release(new HashMap<>());
     }
 
     /**
